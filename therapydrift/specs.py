@@ -34,6 +34,11 @@ class TherapydriftSpec:
     min_signal_count: int
     followup_prefixes: list[str]
     require_recovery_plan: bool
+    ignore_signal_prefixes: list[str]
+    cooldown_seconds: int
+    max_auto_actions_per_hour: int
+    min_new_signals: int
+    circuit_breaker_after: int
 
     @staticmethod
     def from_raw(raw: dict[str, Any]) -> "TherapydriftSpec":
@@ -43,9 +48,27 @@ class TherapydriftSpec:
             min_signal_count = 1
         followup_prefixes = [str(x) for x in (raw.get("followup_prefixes") or ["drift-", "speedrift-pit-"])]
         require_recovery_plan = bool(raw.get("require_recovery_plan", True))
+        ignore_signal_prefixes = [str(x) for x in (raw.get("ignore_signal_prefixes") or ["Therapydrift:"])]
+        cooldown_seconds = int(raw.get("cooldown_seconds", 1800))
+        if cooldown_seconds < 0:
+            cooldown_seconds = 0
+        max_auto_actions_per_hour = int(raw.get("max_auto_actions_per_hour", 2))
+        if max_auto_actions_per_hour < 0:
+            max_auto_actions_per_hour = 0
+        min_new_signals = int(raw.get("min_new_signals", 1))
+        if min_new_signals < 0:
+            min_new_signals = 0
+        circuit_breaker_after = int(raw.get("circuit_breaker_after", 6))
+        if circuit_breaker_after < 1:
+            circuit_breaker_after = 1
         return TherapydriftSpec(
             schema=schema,
             min_signal_count=min_signal_count,
             followup_prefixes=followup_prefixes,
             require_recovery_plan=require_recovery_plan,
+            ignore_signal_prefixes=ignore_signal_prefixes,
+            cooldown_seconds=cooldown_seconds,
+            max_auto_actions_per_hour=max_auto_actions_per_hour,
+            min_new_signals=min_new_signals,
+            circuit_breaker_after=circuit_breaker_after,
         )

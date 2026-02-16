@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from dataclasses import asdict, dataclass
 from typing import Any
 
@@ -32,6 +33,15 @@ def _blocked_by(task: dict[str, Any]) -> list[str]:
     return [str(x) for x in (task.get("blocked_by") or [])]
 
 
+def _parse_ts(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except Exception:
+        return None
+
+
 def compute_therapy_drift(
     *,
     task_id: str,
@@ -39,16 +49,28 @@ def compute_therapy_drift(
     spec: TherapydriftSpec,
     task: dict[str, Any],
     tasks: dict[str, dict[str, Any]],
+    previous_latest_signal_ts: str | None = None,
 ) -> dict[str, Any]:
     findings: list[Finding] = []
 
     logs = task.get("log") or []
-    messages: list[str] = []
+    drift_signals: list[dict[str, str | None]] = []
+    ignored_self_signals = 0
     for e in logs:
-        if isinstance(e, dict):
-            messages.append(str(e.get("message") or ""))
-
-    drift_signals = [m for m in messages if m.startswith(_DRIFT_PREFIXES)]
+        if not isinstance(e, dict):
+            continue
+        message = str(e.get("message") or "")
+        if not message.startswith(_DRIFT_PREFIXES):
+            continue
+        if any(message.startswith(p) for p in spec.ignore_signal_prefixes):
+            ignored_self_signals += 1
+            continue
+        drift_signals.append(
+            {
+                "message": message,
+                "timestamp": str(e.get("timestamp") or "") or None,
+            }
+        )
 
     open_followups: list[str] = []
     for t in tasks.values():
@@ -61,10 +83,33 @@ def compute_therapy_drift(
             continue
         if any(tid.startswith(prefix) for prefix in spec.followup_prefixes):
             open_followups.append(tid)
+    open_followups = sorted(set(open_followups))
+
+    latest_signal_dt: datetime | None = None
+    for s in drift_signals:
+        parsed = _parse_ts(s.get("timestamp"))
+        if parsed is None:
+            continue
+        if latest_signal_dt is None or parsed > latest_signal_dt:
+            latest_signal_dt = parsed
+
+    previous_latest_dt = _parse_ts(previous_latest_signal_ts)
+    new_signal_count = 0
+    if previous_latest_dt is None:
+        new_signal_count = len(drift_signals)
+    else:
+        for s in drift_signals:
+            parsed = _parse_ts(s.get("timestamp"))
+            if parsed is not None and parsed > previous_latest_dt:
+                new_signal_count += 1
 
     telemetry: dict[str, Any] = {
         "drift_signal_count": len(drift_signals),
+        "new_signal_count": new_signal_count,
+        "ignored_self_signals": ignored_self_signals,
         "open_drift_followups": len(open_followups),
+        "open_followup_ids": open_followups[:50],
+        "latest_signal_ts": latest_signal_dt.isoformat() if latest_signal_dt else None,
     }
 
     if spec.schema != 1:
