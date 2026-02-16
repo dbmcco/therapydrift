@@ -46,7 +46,7 @@ class TherapydriftSpec:
         min_signal_count = int(raw.get("min_signal_count", 2))
         if min_signal_count < 1:
             min_signal_count = 1
-        followup_prefixes = [str(x) for x in (raw.get("followup_prefixes") or ["drift-", "speedrift-pit-"])]
+        followup_prefixes = [str(x) for x in (raw.get("followup_prefixes") or ["drift-", "coredrift-pit-", "speedrift-pit-"])]
         require_recovery_plan = bool(raw.get("require_recovery_plan", True))
         ignore_signal_prefixes = [str(x) for x in (raw.get("ignore_signal_prefixes") or ["Therapydrift:"])]
         cooldown_seconds = int(raw.get("cooldown_seconds", 1800))

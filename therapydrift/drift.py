@@ -16,6 +16,7 @@ class Finding:
 
 
 _DRIFT_PREFIXES = (
+    "Coredrift:",
     "Speedrift:",
     "Specdrift:",
     "Datadrift:",

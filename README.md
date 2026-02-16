@@ -2,7 +2,7 @@
 
 `therapydrift` is a Speedrift-suite sidecar for **self-healing drift loops**.
 
-It detects repeated drift signals on a task (for example repeated `Speedrift:` logs) and unresolved drift follow-up tasks, then creates a deterministic recovery task (`drift-therapy-<task>`) when requested.
+It detects repeated drift signals on a task (for example repeated `Coredrift:` logs) and unresolved drift follow-up tasks, then creates a deterministic recovery task (`drift-therapy-<task>`) when requested.
 
 ## Ecosystem Map
 
@@ -10,7 +10,7 @@ This project is part of the Speedrift suite for Workgraph-first drift control.
 
 - Spine: [Workgraph](https://graphwork.github.io/)
 - Orchestrator: [driftdriver](https://github.com/dbmcco/driftdriver)
-- Baseline lane: [speedrift](https://github.com/dbmcco/speedrift)
+- Baseline lane: [coredrift](https://github.com/dbmcco/coredrift)
 - Optional lanes: [specdrift](https://github.com/dbmcco/specdrift), [datadrift](https://github.com/dbmcco/datadrift), [depsdrift](https://github.com/dbmcco/depsdrift), [uxdrift](https://github.com/dbmcco/uxdrift), [therapydrift](https://github.com/dbmcco/therapydrift), [yagnidrift](https://github.com/dbmcco/yagnidrift), [redrift](https://github.com/dbmcco/redrift)
 
 ## Task Spec Format
@@ -21,7 +21,7 @@ Add a per-task fenced TOML block:
 ```therapydrift
 schema = 1
 min_signal_count = 2
-followup_prefixes = ["drift-", "speedrift-pit-"]
+followup_prefixes = ["drift-", "coredrift-pit-"]
 require_recovery_plan = true
 ignore_signal_prefixes = ["Therapydrift:"]
 cooldown_seconds = 1800

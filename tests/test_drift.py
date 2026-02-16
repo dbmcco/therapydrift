@@ -19,7 +19,7 @@ class TestTherapyDrift(unittest.TestCase):
             "title": "Task",
             "status": "in-progress",
             "log": [
-                {"timestamp": "2026-02-16T10:00:00+00:00", "message": "Speedrift: yellow (scope_drift)"},
+                {"timestamp": "2026-02-16T10:00:00+00:00", "message": "Coredrift: yellow (scope_drift)"},
                 {"timestamp": "2026-02-16T10:05:00+00:00", "message": "Specdrift: yellow (spec_not_updated)"},
             ],
         }
