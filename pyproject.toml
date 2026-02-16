@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "therapydrift"
+version = "0.1.0"
+description = "Workgraph sidecar for self-healing drift loops"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+therapydrift = "therapydrift.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["therapydrift*"]

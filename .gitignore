@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Local workgraph state
+.workgraph/
+.therapydrift/
+
+# Packaging / env
+.venv/
+dist/
+build/
+*.egg-info/
