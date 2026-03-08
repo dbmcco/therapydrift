@@ -8,7 +8,9 @@ version = "0.1.0"
 description = "Workgraph sidecar for self-healing drift loops"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "speedrift-lane-sdk",
+]
 
 [project.scripts]
 therapydrift = "therapydrift.cli:main"
@@ -16,3 +18,11 @@ therapydrift = "therapydrift.cli:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["therapydrift*"]
+
+[tool.uv.sources]
+speedrift-lane-sdk = { path = "../speedrift-lane-sdk", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
